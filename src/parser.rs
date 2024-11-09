@@ -43,7 +43,9 @@ pub enum Element<'a> {
         name: &'a str,
     },
     PixelFilter {
-        name: &'a str,
+        // name: &'a str,
+        ty: &'a str,
+        params: ParamList<'a>,
     },
     Identity,
     /// `Translate x y z`
@@ -195,7 +197,9 @@ impl<'a> Parser<'a> {
                 name: self.read_str()?,
             },
             Directive::PixelFilter => Element::PixelFilter {
-                name: self.read_str()?,
+                // name: self.read_str()?,
+                ty: self.read_str()?,
+                params: self.read_param_list()?,
             },
             Directive::Identity => Element::Identity,
             Directive::Translate => Element::Translate {

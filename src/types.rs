@@ -282,7 +282,9 @@ pub enum Integrator {
     /// Metropolis light transport using bidirectional path tracing.
     Mlt,
     /// Path tracing.
-    Path,
+    Path {
+        max_depth: i32
+    },
     /// Rendering using a simple random walk without any explicit light sampling.
     RandomWalk,
     /// Path tracing with very basic sampling algorithms.
@@ -303,6 +305,9 @@ impl Integrator {
         let integ = match ty {
             "volpath" => Integrator::VolPath {
                 max_depth: params.integer("maxdepth", 5)?,
+            },
+            "path" => Integrator::Path {
+                max_depth: params.integer("maxdepth", 5)?
             },
             _ => unimplemented!(),
         };
@@ -372,6 +377,30 @@ impl Accelerator {
         };
 
         Ok(acc)
+    }
+}
+
+
+pub enum PixelFilter {
+    Triangle {
+        float_xradius: f32,
+        float_yradius: f32,
+    }
+}
+
+
+impl PixelFilter {
+    pub fn new(ty: &str, params: ParamList) -> Result<PixelFilter> {
+        let pixel_filter = match ty {
+            "triangle" => {
+                PixelFilter::Triangle {
+                    float_xradius: params.float("float_xradius", 1.)?,
+                    float_yradius: params.float("float_yradius", 1.)?,
+                }
+            },
+            _ => { todo!(); }
+        };
+        Ok(pixel_filter)
     }
 }
 
