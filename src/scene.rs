@@ -219,7 +219,8 @@ impl Scene {
 
                     let entity = CameraEntity {
                         params: camera,
-                        transform: world_from_camera,
+                        // transform: world_from_camera,
+                        transform: camera_from_world,
                     };
 
                     scene.camera = Some(entity);
