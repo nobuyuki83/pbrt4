@@ -565,6 +565,15 @@ pub enum ColorType {
     },
 }
 
+impl ColorType  {
+    pub fn get_rgb(&self) -> [f32; 3] {
+        match self {
+            ColorType::Rgb { rgb } => *rgb,
+            _ => [0.0, 0.0, 0.0],
+        }
+    }
+}
+
 /// Materials specify the light scattering properties of surfaces in the scene.
 #[derive(Debug)]
 pub struct Material {

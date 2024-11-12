@@ -96,6 +96,6 @@ fn cornell() {
         // println!("{:?}", tmp1);
         // println!("{:?}\n", tmp2);
     }
-    let tmp = &scene.area_lights;
-    // println!("{:?}", tmp);
+    let tmp = &scene.lights;
+    println!("{:?}", tmp);
 }
