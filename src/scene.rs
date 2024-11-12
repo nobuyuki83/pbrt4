@@ -1,6 +1,6 @@
 //! Scene loader
 
-use std::{collections::HashMap, env, fs, path::Path, slice, str};
+use std::{collections::HashMap, env, fs, path::Path, slice, str, thread::current};
 
 use glam::{Mat4, Vec3};
 
@@ -49,6 +49,7 @@ pub struct CameraEntity {
 
 #[derive(Debug)]
 pub struct ShapeEntity {
+    pub index: usize,
     pub params: Shape,
     /// If shape is a part of [Object], transform matrix defines the transformation from
     /// object space to the instance's coordinate space.
@@ -74,7 +75,7 @@ pub struct Instance {
     pub reverse_orientation: bool,
 }
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct Scene {
     pub start_time: f32,
     pub end_time: f32,
@@ -404,6 +405,7 @@ impl Scene {
                     // TODO: handle mediums
 
                     let entity = ShapeEntity {
+                        index: current_state.material_index.unwrap(),
                         params: shape,
                         transform: current_state.transform_matrix,
                         reverse_orientation: current_state.reverse_orientation,

@@ -81,7 +81,21 @@ fn disney_cloud() {
 #[test]
 fn kroken() {
     let scene = Scene::from_file("assets/kroken/camera-1.pbrt").unwrap();
+    println!("{:?}", scene);
     assert_eq!(scene.instances.len(), 10);
 
     assert_eq!(scene.textures.len(), 74);
+}
+
+#[test]
+fn cornell() {
+    let scene = Scene::from_file("assets/cornell-box/scene-v4.pbrt").unwrap();
+    for i in 0..scene.materials.len() {
+        let tmp1 = &scene.materials[i];
+        let tmp2 = &scene.shapes[i];
+        // println!("{:?}", tmp1);
+        // println!("{:?}\n", tmp2);
+    }
+    let tmp = &scene.area_lights;
+    // println!("{:?}", tmp);
 }
