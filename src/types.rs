@@ -1,6 +1,6 @@
 //! Data structures that can be deserialized from a parameter list.
 
-use std::{collections::HashMap, str::FromStr};
+use std::{collections::HashMap, default, str::FromStr};
 
 use crate::{
     param::{Param, ParamList, Spectrum},
@@ -381,6 +381,7 @@ impl Accelerator {
 }
 
 
+#[derive(Debug)]
 pub enum PixelFilter {
     Triangle {
         float_xradius: f32,
@@ -546,15 +547,44 @@ impl Texture {
     }
 }
 
+/// The "rgb" color type is the default color type for materials.
+#[derive(Debug, Default)]
+pub enum ColorType {
+    /// The "rgb" color type is the default color type for materials.
+    Rgb {
+        /// The RGB color value.
+        rgb: [f32; 3],
+    },
+    /// "Blackbody" color type.
+    #[default]
+    Blackbody,
+    /// "spectrum" color type.
+    Spectrum {
+        // Add fields or remove this variant if not needed
+        // Example: Spectrum { values: Vec<f32> },
+    },
+}
+
+impl ColorType  {
+    pub fn get_rgb(&self) -> [f32; 3] {
+        match self {
+            ColorType::Rgb { rgb } => *rgb,
+            _ => [0.0, 0.0, 0.0],
+        }
+    }
+}
+
 /// Materials specify the light scattering properties of surfaces in the scene.
 #[derive(Debug)]
 pub struct Material {
-    pub ty: String,
+    pub name: String,
+    pub attributes: String,
+    pub reflectance: ColorType,
 }
 
 impl Material {
     pub fn new(
-        name: &str,
+        _name: &str,
         _params: ParamList,
         _texture_map: &HashMap<String, usize>,
     ) -> Result<Material> {
@@ -562,9 +592,16 @@ impl Material {
         // specify spatially-varying values for the parameters.
 
         // TODO: Parse material parameters.
+        // println!("{:?}, {:?}", _params, _texture_map);
+        let attrib = _params.get("type").unwrap().single::<String>().unwrap();
+        // println!("{:?}", attrib);
+        let color = _params.get("reflectance").unwrap().rgb()?;
+        // println!("{:?}", color);
 
         Ok(Material {
-            ty: name.to_string(),
+            name: _name.to_string(),
+            attributes: attrib.trim_matches('"').to_string(),
+            reflectance: ColorType::Rgb { rgb: color },
         })
     }
 }
@@ -631,6 +668,10 @@ pub enum Shape {
 
 impl Shape {
     pub fn new(ty: &str, params: ParamList) -> Result<Self> {
+        
+        // println!("{:?}", ty);
+        // println!("{:?}\n", params);
+
         // All shapes take an optional "alpha" parameter that can be
         // used to define a mask that cuts away regions of a surface.
         let alpha = params.float("alpha", 1.0)?;
