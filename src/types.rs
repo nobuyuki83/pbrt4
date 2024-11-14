@@ -474,7 +474,7 @@ impl Light {
 }
 
 /// Area lights have geometry associated with them.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum AreaLight {
     Diffuse {
         /// Filename for an image that describes spatially-varying emission over the surface of the emitter.
