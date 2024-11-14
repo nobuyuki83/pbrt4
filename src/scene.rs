@@ -49,7 +49,6 @@ pub struct CameraEntity {
 
 #[derive(Debug)]
 pub struct ShapeEntity {
-    pub index: usize,
     pub params: Shape,
     /// If shape is a part of [Object], transform matrix defines the transformation from
     /// object space to the instance's coordinate space.
@@ -364,6 +363,9 @@ impl Scene {
                 }
                 Element::NamedMaterial { name } => {
                     // TODO: handle material not found case.
+                    if !named_materials.contains_key(name) {
+                        return Err(Error::NotFound);
+                    }
                     current_state.material_index = named_materials.get(name).copied();
                 }
                 Element::LightSource { ty, params } => {
@@ -405,7 +407,6 @@ impl Scene {
                     // TODO: handle mediums
 
                     let entity = ShapeEntity {
-                        index: current_state.material_index.unwrap(),
                         params: shape,
                         transform: current_state.transform_matrix,
                         reverse_orientation: current_state.reverse_orientation,

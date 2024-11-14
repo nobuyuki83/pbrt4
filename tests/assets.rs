@@ -93,9 +93,9 @@ fn cornell() {
     for i in 0..scene.materials.len() {
         let tmp1 = &scene.materials[i];
         let tmp2 = &scene.shapes[i];
-        // println!("{:?}", tmp1);
-        // println!("{:?}\n", tmp2);
+        println!("{:?}\n", tmp1);
+        println!("{:?}\n", tmp2);
     }
-    let tmp = &scene.lights;
+    let tmp = &scene.area_lights[0];
     println!("{:?}", tmp);
 }
