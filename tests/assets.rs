@@ -99,3 +99,8 @@ fn cornell() {
     let tmp = &scene.area_lights[0];
     println!("{:?}", tmp);
 }
+
+#[test]
+fn balls() {
+    let Scene = Scene::from_file("assets/material-testball/scene-v4.pbrt").unwrap();
+}
