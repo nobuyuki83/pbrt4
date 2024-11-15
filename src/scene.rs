@@ -8,7 +8,7 @@ use crate::{
     param::ParamList,
     types::{
         Accelerator, AreaLight, Camera, Film, Integrator, Light, Material, Medium, Options,
-        Sampler, Shape, Texture, PixelFilter
+        PixelFilter, Sampler, Shape, Texture,
     },
     Element, Error, Parser, Result,
 };
@@ -342,7 +342,7 @@ impl Scene {
                     named_textures.insert(name.to_string(), index);
                 }
                 // The Material directive specifies the current material, which then applies for all subsequent
-                // shape definitions (until the end of the current attribute scope or until a new material is defined.
+                // shape definitions until the end of the current attribute scope or until a new material is defined.
                 Element::Material { ty, mut params } => {
                     params.extend(&current_state.material_params);
                     let material = Material::new(ty, params, &named_textures)?;

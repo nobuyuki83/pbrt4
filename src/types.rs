@@ -3,7 +3,7 @@
 use std::{collections::HashMap, default, str::FromStr};
 
 use crate::{
-    param::{Param, ParamList, Spectrum},
+    param::{Param, ParamList, ParamType, Spectrum},
     Error, Result,
 };
 
@@ -593,9 +593,30 @@ impl Material {
 
         // TODO: Parse material parameters.
         // println!("{:?}, {:?}", _params, _texture_map);
-        let attrib = _params.get("type").unwrap().single::<String>().unwrap();
+        let mut attrib = "".to_string();
+        match _params.get("type") {
+            Some(t) => {
+                attrib = t.single::<String>().unwrap();
+            }
+            None => {
+                attrib = "".to_string();
+            }
+        }
         // println!("{:?}", attrib);
-        let color = _params.get("reflectance").unwrap().rgb()?;
+        let mut color = [0.0, 0.0, 0.0];
+        match _params.get("reflectance") {
+            Some(r) => {
+                match r.ty {
+                    ParamType::Rgb => {
+                        color = r.rgb().unwrap();
+                    }
+                    _ => {}
+                }
+            }
+            None => {
+                color = [0.0, 0.0, 0.0];
+            }
+        }
         // println!("{:?}", color);
 
         Ok(Material {
