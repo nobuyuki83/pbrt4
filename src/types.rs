@@ -1,6 +1,6 @@
 //! Data structures that can be deserialized from a parameter list.
 
-use std::{collections::HashMap, default, str::FromStr};
+use std::{collections::HashMap, default, str::FromStr, string};
 
 use crate::{
     param::{Param, ParamList, ParamType, Spectrum},
@@ -282,9 +282,7 @@ pub enum Integrator {
     /// Metropolis light transport using bidirectional path tracing.
     Mlt,
     /// Path tracing.
-    Path {
-        max_depth: i32
-    },
+    Path { max_depth: i32 },
     /// Rendering using a simple random walk without any explicit light sampling.
     RandomWalk,
     /// Path tracing with very basic sampling algorithms.
@@ -307,7 +305,7 @@ impl Integrator {
                 max_depth: params.integer("maxdepth", 5)?,
             },
             "path" => Integrator::Path {
-                max_depth: params.integer("maxdepth", 5)?
+                max_depth: params.integer("maxdepth", 5)?,
             },
             _ => unimplemented!(),
         };
@@ -380,26 +378,24 @@ impl Accelerator {
     }
 }
 
-
 #[derive(Debug)]
 pub enum PixelFilter {
     Triangle {
         float_xradius: f32,
         float_yradius: f32,
-    }
+    },
 }
-
 
 impl PixelFilter {
     pub fn new(ty: &str, params: ParamList) -> Result<PixelFilter> {
         let pixel_filter = match ty {
-            "triangle" => {
-                PixelFilter::Triangle {
-                    float_xradius: params.float("float_xradius", 1.)?,
-                    float_yradius: params.float("float_yradius", 1.)?,
-                }
+            "triangle" => PixelFilter::Triangle {
+                float_xradius: params.float("float_xradius", 1.)?,
+                float_yradius: params.float("float_yradius", 1.)?,
             },
-            _ => { todo!(); }
+            _ => {
+                todo!();
+            }
         };
         Ok(pixel_filter)
     }
@@ -565,7 +561,7 @@ pub enum ColorType {
     },
 }
 
-impl ColorType  {
+impl ColorType {
     pub fn get_rgb(&self) -> [f32; 3] {
         match self {
             ColorType::Rgb { rgb } => *rgb,
@@ -580,7 +576,13 @@ pub struct Material {
     pub name: String,
     pub attributes: String,
     pub reflectance: ColorType,
+    pub params: HashMap<String, MaterialParam>,
 }
+
+/// Parameter type.
+/// Parameter name.
+/// One or more values.
+type MaterialParam = (ParamType, String, String);
 
 impl Material {
     pub fn new(
@@ -591,8 +593,6 @@ impl Material {
         // Parameters to materials are distinctive in that textures can be used to
         // specify spatially-varying values for the parameters.
 
-        // TODO: Parse material parameters.
-        // println!("{:?}, {:?}", _params, _texture_map);
         let mut attrib = "".to_string();
         match _params.get("type") {
             Some(t) => {
@@ -605,24 +605,30 @@ impl Material {
         // println!("{:?}", attrib);
         let mut color = [0.0, 0.0, 0.0];
         match _params.get("reflectance") {
-            Some(r) => {
-                match r.ty {
-                    ParamType::Rgb => {
-                        color = r.rgb().unwrap();
-                    }
-                    _ => {}
+            Some(r) => match r.ty {
+                ParamType::Rgb => {
+                    color = r.rgb().unwrap();
                 }
-            }
+                _ => {}
+            },
             None => {
                 color = [0.0, 0.0, 0.0];
             }
         }
-        // println!("{:?}", color);
+
+        let mut params: HashMap<String, MaterialParam> = HashMap::new();
+        for p in _params.get_data().iter() {
+            params.insert(
+                p.1.name.to_string(),
+                (p.1.ty, p.1.name.to_string(), p.1.value.to_string()),
+            );
+        }
 
         Ok(Material {
             name: _name.to_string(),
             attributes: attrib.trim_matches('"').to_string(),
             reflectance: ColorType::Rgb { rgb: color },
+            params,
         })
     }
 }
@@ -689,7 +695,6 @@ pub enum Shape {
 
 impl Shape {
     pub fn new(ty: &str, params: ParamList) -> Result<Self> {
-        
         // println!("{:?}", ty);
         // println!("{:?}\n", params);
 

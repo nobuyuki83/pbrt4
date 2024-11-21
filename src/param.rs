@@ -3,6 +3,7 @@
 use std::{
     collections::HashMap,
     num::{ParseFloatError, ParseIntError},
+    path::Iter,
     result,
     str::{FromStr, ParseBoolError},
 };
@@ -70,7 +71,7 @@ pub struct Param<'a> {
     /// Parameter type.
     pub ty: ParamType,
     /// One or more values.
-    value: &'a str,
+    pub value: &'a str,
 }
 
 impl<'a> Param<'a> {
@@ -201,6 +202,10 @@ impl<'a> ParamList<'a> {
         for (k, v) in &other.0 {
             self.0.insert(k, v.clone());
         }
+    }
+
+    pub fn get_data(&self) -> &HashMap<&'a str, Param<'a>> {
+        &self.0
     }
 }
 
