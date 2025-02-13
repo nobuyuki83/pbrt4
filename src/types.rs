@@ -523,7 +523,13 @@ pub struct Texture {
     pub name: String,
     pub ty: TextureType,
     pub class: String,
+    pub params: HashMap<String, TextureParam>,
 }
+
+/// Parameter type.
+/// Parameter name.
+/// One or more values.
+type TextureParam = (ParamType, String, String);
 
 impl Texture {
     pub fn new(name: &str, ty: &str, class: &str, _params: ParamList) -> Result<Texture> {
@@ -533,12 +539,19 @@ impl Texture {
             _ => return Err(Error::InvalidObjectType),
         };
 
-        // TODO: Parse parameters.
+        let mut params: HashMap<String, TextureParam> = HashMap::new();
+        for p in _params.get_data().iter() {
+            params.insert(
+                p.1.name.to_string(),
+                (p.1.ty, p.1.name.to_string(), p.1.value.to_string()),
+            );
+        }
 
         Ok(Texture {
             name: name.to_string(),
             ty,
             class: class.to_string(),
+            params,
         })
     }
 }
