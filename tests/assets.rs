@@ -31,7 +31,7 @@ fn disney_cloud() {
     {
         let infinite = &scene.lights[0];
 
-        let Light::Infinite { spectrum , ..} = infinite else {
+        let Light::Infinite { spectrum, .. } = infinite else {
             panic!("Unexpected light type at 0, want Infinite");
         };
 
@@ -62,7 +62,14 @@ fn disney_cloud() {
     // Sphere
     {
         let sphere = &scene.shapes[1];
-        let Shape::Sphere { alpha, radius, zmin, zmax, phimax } = sphere.params else {
+        let Shape::Sphere {
+            alpha,
+            radius,
+            zmin,
+            zmax,
+            phimax,
+        } = sphere.params
+        else {
             panic!("Unexpected shape at 1, want Sphere");
         };
 

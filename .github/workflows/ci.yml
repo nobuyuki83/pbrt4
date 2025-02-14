@@ -28,7 +28,7 @@ jobs:
       - name: Run checks
         run: |
           cargo check --examples --tests
-          cargo fmt --all -- --check --files-with-diff
+          cargo fmt --all -- --check
           cargo clippy --examples --tests -- -D warnings
           cargo test
           cargo doc --no-deps
